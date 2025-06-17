@@ -20,12 +20,12 @@ class SubscriptionRequests extends Model
 
     public function trainee() : BelongsTo
     {
-        return $this->belongsTo(User::class, 'trainee_id');
+        return $this->belongsTo(Trainee::class, 'trainee_id');
     }
 
     public function trainer() : BelongsTo
     {
-        return $this->belongsTo(User::class, 'trainer_id');
+        return $this->belongsTo(Trainer::class, 'trainer_id');
     }
 
 }

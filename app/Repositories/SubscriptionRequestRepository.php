@@ -26,8 +26,14 @@ class SubscriptionRequestRepository
         return $subscriptionRequests->delete();
     }
 
-    public function getThisMonthActiveRequests(Trainee $trainee, $month) : Collection
+    public function findSubscriptionRequestById(int $requestId): ?SubscriptionRequests
     {
+        return SubscriptionRequests::where('id', $requestId)->first();
+    }
+
+    public function getThisMonthActiveRequests(int $traineeId, $month) : Collection
+    {
+        $trainee = Trainee::where('id', $traineeId)->firstOrFail();
         return $trainee->subscriptionRequests()
             ->whereRaw("DATE_FORMAT(request_date, '%Y-%m') = ?", [$month])
             ->whereIn('request_status',['Pending' , 'Approved'])
@@ -36,12 +42,15 @@ class SubscriptionRequestRepository
 
     public function getAllTraineeRequests(Trainee $trainee) : Collection
     {
-        return $trainee->subscriptionRequests()->get();
+        return $trainee->subscriptionRequests()
+            ->with(['trainer.user'])
+            ->get();
     }
 
     public function getActiveTraineeRequests(Trainee $trainee) : Collection
     {
         return $trainee->subscriptionRequests()
+            ->with(['trainer.user'])
             ->where('request_status', 'Pending')
             ->orderBy('request_date', 'desc')
             ->get();
@@ -50,6 +59,7 @@ class SubscriptionRequestRepository
     public function getCancelledTraineeRequests(Trainee $trainee) : Collection
     {
         return $trainee->subscriptionRequests()
+            ->with(['trainer.user'])
             ->where('request_status', 'Cancelled')
             ->orderBy('request_date', 'desc')
             ->get();
@@ -58,6 +68,7 @@ class SubscriptionRequestRepository
     public function getApprovedTraineeRequests(Trainee $trainee) : Collection
     {
         return $trainee->subscriptionRequests()
+            ->with(['trainer.user'])
             ->where('request_status', 'Approved')
             ->orderBy('request_date', 'desc')
             ->get();
@@ -66,6 +77,7 @@ class SubscriptionRequestRepository
     public function getRejectedTraineeRequests(Trainee $trainee) : Collection
     {
         return $trainee->subscriptionRequests()
+            ->with(['trainer.user'])
             ->where('request_status', 'Rejected')
             ->orderBy('request_date', 'desc')
             ->get();
@@ -77,14 +89,14 @@ class SubscriptionRequestRepository
     }
 
 
-    public  function acceptRequests(SubscriptionRequests $subscriptionRequests) : bool
+    public  function acceptRequests(SubscriptionRequests $subscriptionRequests) : void
     {
-        return $subscriptionRequests->update(['request_status' => 'Approved']);
+        $subscriptionRequests->update(['request_status' => 'Approved']);
     }
 
-    public function rejectRequests(SubscriptionRequests $subscriptionRequests) : bool
+    public function rejectRequests(SubscriptionRequests $subscriptionRequests) : void
     {
-        return $subscriptionRequests->update(['request_status' => 'Rejected']);
+        $subscriptionRequests->update(['request_status' => 'Rejected']);
     }
 
     public function getActiveTrainerRequests(Trainer $trainer) : Collection

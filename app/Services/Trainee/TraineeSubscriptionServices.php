@@ -20,9 +20,10 @@ class TraineeSubscriptionServices
         $this->trainerRepository = $trainerRepository;
     }
 
-    public function sendSubscriptionRequest(Trainee $trainee, Trainer $trainer): array
+    public function sendSubscriptionRequest(int $traineeId , int $trainerId ): array
     {
-        $trainer = $this->trainerRepository->getTrainerById($trainer->id);
+        $trainer = $this->trainerRepository->getTrainerById($trainerId);
+        $trainee = Trainee::where('id', $traineeId)->firstOrFail();
 
         if (!$trainer) {
             return [
@@ -32,12 +33,12 @@ class TraineeSubscriptionServices
         }
 
         $currentMonth = now()->format('Y-m');
-        $currentMonthSubscription = $this->subscriptionRequestRepository->getThisMonthActiveRequests($trainee, $currentMonth);
+        $currentMonthSubscription = $this->subscriptionRequestRepository->getThisMonthActiveRequests($traineeId, $currentMonth);
 
         if ($currentMonthSubscription->isNotEmpty()) {
             return [
                 'success' => false,
-                "Invalid Request you already have an active subscription request. You must cancel it before sending a new one."
+                'message' => "Invalid Request: you already have an active subscription request. You must cancel it before sending a new one."
             ];
         }
 
@@ -51,6 +52,11 @@ class TraineeSubscriptionServices
             'success' => true,
             'subscription' => $subscription
         ];
+    }
+
+    public function getSubscriptionRequestById(int $requestId): SubscriptionRequests
+    {
+        return $this->subscriptionRequestRepository->findSubscriptionRequestById($requestId);
     }
 
     public function getAllRequests(Trainee $trainee): Collection

@@ -7,6 +7,7 @@ use App\Http\Controllers\Trainee\RegisterTraineeController;
 use App\Http\Controllers\Trainee\TraineeSubscriptionController;
 use App\Http\Controllers\Trainee\TrainersIntegrationController;
 use App\Http\Controllers\Trainer\RegisterTrainerController;
+use App\Http\Controllers\Trainer\TrainerSubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +19,7 @@ Route::prefix('Auth')->group(function () {
     Route::post('/register',[RegisterStepOneController::class,'firstStepRegister']); //Done
     Route::post('/trainee/register', [RegisterTraineeController::class,'register']); //Done
     Route::post('/trainer/register', [RegisterTrainerController::class,'register']);
-    Route::post('/trainer/certificate', [RegisterTrainerController::class,'addCertificate']);
+    Route::post('/trainer/certificate', [RegisterTrainerController::class,'addCertificate']); //Done
     Route::post('/login', [AuthenticatedController::class, 'login']); //Done
 
 
@@ -30,22 +31,34 @@ Route::prefix('Auth')->group(function () {
     });
 });
 
-//Route::middleware(['auth:sanctum','role:trainee'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('Trainee')->group(function () {
         Route::prefix('trainers_integration')->group(function () {
-            Route::get('trainers', [TrainersIntegrationController::class, 'getTrainers']);
-            Route::get('trainer/{id}', [TrainersIntegrationController::class, 'getTrainer']);
+            Route::get('trainers', [TrainersIntegrationController::class, 'getTrainers']); //Done
+            Route::get('trainer/{id}', [TrainersIntegrationController::class, 'getTrainer']); //Done
         });
 
         Route::prefix('subscription_requests')->group(function () {
-            Route::post('/send/{id}', [TraineeSubscriptionController::class, 'sendSubscriptionRequest']);
+            Route::post('/send/{id}', [TraineeSubscriptionController::class, 'sendSubscriptionRequest']); //Done
+            Route::get('/get-requests', [TraineeSubscriptionController::class, 'getTraineeSubscriptionRequests']); //Done
+            Route::get('/get-accepted-requests', [TraineeSubscriptionController::class, 'getTraineeAcceptedSubscriptionRequests']);
+            Route::get('/get-rejected-requests', [TraineeSubscriptionController::class, 'getTraineeRejectedSubscriptionRequests']);
+            Route::get('/get-cancelled-requests', [TraineeSubscriptionController::class, 'getTrainerCancelledSubscriptionRequests']);
+            Route::get('/get-active-requests', [TraineeSubscriptionController::class, 'getActiveSubscriptionRequests']);
+            Route::post('/cancel/{id}', [TraineeSubscriptionController::class, 'cancelSubscriptionRequest']); //Done
         });
     });
-//});
+});
 
 
-//Route::middleware(['auth:sanctum','role:trainer'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('Trainer')->group(function () {
-
+        Route::prefix('subscription_requests')->group(function () {
+            Route::get('/get-requests', [TrainerSubscriptionController::class, 'getActiveRequest']); //Done
+            Route::post('/accept/{id}', [TrainerSubscriptionController::class, 'acceptRequest']); //Done
+            Route::post('/reject/{id}', [TrainerSubscriptionController::class, 'rejectRequest']); //Done
+            Route::get('/get-accepted-requests', [TrainerSubscriptionController::class, 'getApprovedRequests']);
+            Route::get('/get-rejected-requests', [TrainerSubscriptionController::class, 'getRejectedRequests']);
+        });
     });
-//});
+});
