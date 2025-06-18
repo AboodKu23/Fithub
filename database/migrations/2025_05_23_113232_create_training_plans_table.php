@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('training_plans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subscription_id')->constrained('subscriptions')->onDelete('cascade');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->foreignId('trainer_id')->constrained('trainers')->onDelete('cascade');
+            $table->string('title');
+            $table->string('goal')->nullable();
             $table->text('notes')->nullable();
+            $table->integer('duration_days')->default(30);
             $table->timestamps();
         });
     }

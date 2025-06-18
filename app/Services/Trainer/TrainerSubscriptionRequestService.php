@@ -2,20 +2,24 @@
 
 namespace App\Services\Trainer;
 
+use App\Models\SubscriptionTrainingPlan;
 use App\Models\Trainer;
 use App\Repositories\SubscriptionRepository;
 use App\Repositories\SubscriptionRequestRepository;
+use App\Repositories\TrainingPlanRepository;
 use Illuminate\Support\Collection;
 
-class TrainerSubscriptionServices
+class TrainerSubscriptionRequestService
 {
     protected SubscriptionRequestRepository $subscriptionRequestRepository;
     protected SubscriptionRepository $subscriptionRepository;
+    protected SubscriptionTrainingPlan  $subscriptionTrainingPlan;
 
-    public function __construct(SubscriptionRequestRepository $subscriptionRequestRepository, SubscriptionRepository $subscriptionRepository)
+    public function __construct(SubscriptionRequestRepository $subscriptionRequestRepository, SubscriptionRepository $subscriptionRepository, SubscriptionTrainingPlan $subscriptionTrainingPlan)
     {
         $this->subscriptionRequestRepository = $subscriptionRequestRepository;
         $this->subscriptionRepository = $subscriptionRepository;
+        $this->subscriptionTrainingPlan = $subscriptionTrainingPlan;
     }
 
     public function getActiveRequests(int $trainerId) : Collection
@@ -49,7 +53,13 @@ class TrainerSubscriptionServices
             'trainee_id' => $trainee->id,
             'trainer_id' => $trainerId,
             'subscription_date' => now(),
-            'expire_date' => now()->addDays(30),
+            'expire_date' => now()->addDays(31),
+        ]);
+
+        $newPlan = $this->subscriptionTrainingPlan->create([
+            'subscription_id' => $newSubscription->id,
+            'start_date' => now()->addDays(1),
+            'end_date' => $newSubscription->expire_date,
         ]);
 
 //        $trainee->user->notify(new AcceptSubscriptionRequest($request));
@@ -57,7 +67,10 @@ class TrainerSubscriptionServices
         return [
             'success' => true,
             'message' => 'Request accepted',
-            'data' => $newSubscription
+            'data' => [
+                'subscription' => $newSubscription,
+                'plan' => $newPlan
+            ]
         ];
     }
 

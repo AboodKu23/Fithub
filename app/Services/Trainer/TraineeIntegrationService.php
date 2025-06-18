@@ -3,19 +3,27 @@
 namespace App\Services\Trainer;
 
 use App\Models\Trainee;
+use App\Repositories\SubscriptionRepository;
 use App\Repositories\TraineeRepository;
+use Illuminate\Http\JsonResponse;
 
-class TraineeIntegrationServices
+class TraineeIntegrationService
 {
     protected TraineeRepository $traineeRepository;
+    protected SubscriptionRepository $subscriptionRepository;
 
-    public function __construct(TraineeRepository $traineeRepository)
+    public function __construct(TraineeRepository $traineeRepository, SubscriptionRepository $subscriptionRepository)
     {
         $this->traineeRepository = $traineeRepository;
+        $this->subscriptionRepository = $subscriptionRepository;
     }
 
-    public function getTraineeProfile(int $traineeId, int $trainerId) : Trainee
+    public function getTraineeInfo(int $trainerId, int $traineeId): Trainee
     {
-        return $this->traineeRepository->getTraineeProfile($traineeId, $trainerId);
+        if (!$this->subscriptionRepository->ifHasActiveSubscription($traineeId,$trainerId)) {
+            return $this->traineeRepository->getTraineeProfileIfNotSubscription($traineeId);
+        }
+        else
+            return $this->traineeRepository->getTraineeProfileIfSubscription($trainerId, $traineeId);
     }
 }

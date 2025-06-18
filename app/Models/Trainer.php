@@ -62,4 +62,10 @@ class Trainer extends Model
     {
         return $this->certificates()->where('verification_status', 'Verified');
     }
+
+    public function trainingPlans(): HasMany
+    {
+        return $this->hasMany(TrainingPlan::class);
+    }
+
 }

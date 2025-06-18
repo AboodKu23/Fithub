@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Trainer;
 
 use App\Http\Controllers\Controller;
-use App\Services\Trainer\TrainerSubscriptionServices;
+use App\Services\Trainer\TrainerSubscriptionRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +13,9 @@ use function PHPUnit\Framework\isEmpty;
 
 class TrainerSubscriptionController extends Controller
 {
-    protected TrainerSubscriptionServices $trainersSubscriptionServices;
+    protected TrainerSubscriptionRequestService $trainersSubscriptionServices;
 
-    public function __construct(TrainerSubscriptionServices $trainersSubscriptionServices)
+    public function __construct(TrainerSubscriptionRequestService $trainersSubscriptionServices)
     {
         $this->trainersSubscriptionServices = $trainersSubscriptionServices;
     }

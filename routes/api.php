@@ -3,10 +3,12 @@
 use App\Http\Controllers\Auth\AuthenticatedController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\RegisterStepOneController;
+use App\Http\Controllers\Exercises\ExercisesController;
 use App\Http\Controllers\Trainee\RegisterTraineeController;
 use App\Http\Controllers\Trainee\TraineeSubscriptionController;
 use App\Http\Controllers\Trainee\TrainersIntegrationController;
 use App\Http\Controllers\Trainer\RegisterTrainerController;
+use App\Http\Controllers\Trainer\TraineeIntegrationController;
 use App\Http\Controllers\Trainer\TrainerSubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +31,15 @@ Route::prefix('Auth')->group(function () {
         Route::post('/resend', [EmailVerificationController::class, 'resend'])
             ->middleware('auth:sanctum');
     });
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+   Route::prefix('Services')->group(function () {
+       Route::prefix('Exercises')->group(function () {
+           Route::get('/get-exercises',[ExercisesController::class,'getAllExercises']); //Done
+           Route::get('/get-selected-exercise/{id}',[ExercisesController::class,'getSelectedExercise']); //Done
+       });
+   }) ;
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -60,5 +71,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/get-accepted-requests', [TrainerSubscriptionController::class, 'getApprovedRequests']);
             Route::get('/get-rejected-requests', [TrainerSubscriptionController::class, 'getRejectedRequests']);
         });
+
+        Route::prefix('subscriptions')->group(function () {
+            Route::get('/get-active-subscriptions', [TrainerSubscriptionController::class, 'getActiveSubscriptions']);
+            Route::get('/get-subscriptions/{id}', [TrainerSubscriptionController::class, 'getSubscription']);
+            Route::get('/get-trainee/{id}', [TraineeIntegrationController::class, 'getTraineeInfo']);
+        });
+
+
     });
 });
