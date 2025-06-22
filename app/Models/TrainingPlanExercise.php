@@ -13,7 +13,7 @@ class TrainingPlanExercise extends Model
     protected $fillable = [
         'training_plan_id',
         'exercise_id',
-        'dayOfWeek',
+        'dayNumber',
         'setNumber',
         'reps',
         'weightKg',

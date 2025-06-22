@@ -16,13 +16,13 @@ return new class extends Migration
             $table->foreignId('training_plan_id')->constrained('training_plans')->onDelete('cascade');
             $table->foreignId('exercise_id')->constrained('exercises')->onDelete('cascade');
             $table->enum('dayOfWeek',['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
-            $table->integer('setNumber');
-            $table->integer('reps');
+            $table->integer('setNumber')->nullable();
+            $table->integer('reps')->nullable();
             $table->decimal('weightKg')->nullable();
             $table->integer('duration')->nullable();
             $table->integer('reset_duration')->nullable();
             $table->text('notes')->nullable();
-            $table->integer('orderInDay');
+            $table->integer('orderInDay')->default(0)->nullable();
             $table->timestamps();
         });
     }
